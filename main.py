@@ -1,7 +1,4 @@
-from DataCollector import DataCollector
-from DataProcessor import DataProcessor 
-from AudioWriter import AudioWriter
-from AudioPlayer import AudioPlayer
+from WhiteNoise import DataCollector, DataProcessor, AudioWriter, AudioPlayer
 
 dc = DataCollector()
 dp = DataProcessor(dc)
