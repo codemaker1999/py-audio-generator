@@ -4,19 +4,18 @@ from random import random
 
 class DataCollector:
 
-
-    def __init__(queueSize=1000):
+    def __init__(self, queueSize=1000):
         # connect FIFO queues
-        self.queueOut    = Queue(queueSize)
+        self.queueOut = Queue(queueSize)
 
-    def start():
+    def start(self):
         # read/write from queue
         while True:
-            n = random()
-            self.queueOut.put( n )
-
-'''
-dc = DataProcessor(stuff,344)
-dc.start()
-dc.queueOut
-'''
+            chan = []
+            for i in range(2):
+                nums = []
+                for j in range(100):
+                    n = random()
+                    nums.append(n)
+                chan.append(nums)
+            self.queueOut.put( chan )

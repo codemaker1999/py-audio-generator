@@ -2,7 +2,7 @@ from Queue import Queue
 from threading import Thread
 from array import array
 from struct import pack
-import audioWriter
+import pyaudio
 
 class AudioWriter:
     '''
@@ -20,14 +20,14 @@ class AudioWriter:
     RATE = 41000
     CHANNELS = 1
 
-    def __init__(dataProcessor, queueSize=1000):
+    def __init__(self, dataProcessor, queueSize=1000):
         # connect FIFO queues
         self.queueOut    = Queue(queueSize)
         self.dp          = dataProcessor
         self.queueIn     = dataProcessor.queueOut
         self.childThread = Thread(target=self.dp.start)
 
-    def start():
+    def start(self):
         # start data processor
         self.childThread.start()
         # read/write from queue
@@ -36,7 +36,7 @@ class AudioWriter:
             result = self.process( buf )
             self.queueOut.put( result )
 
-    def process(buf):
+    def process(self, buf):
         output = []
 
         for channel in buf:

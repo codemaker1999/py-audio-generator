@@ -11,7 +11,7 @@ class AudioPlayer:
     through the default audio device.
     '''
 
-    def __init__(audioWriter):
+    def __init__(self, audioWriter):
         # connect FIFO queues
         self.aw          = audioWriter
         self.queueIn     = audioWriter.queueOut
@@ -25,11 +25,11 @@ class AudioPlayer:
             output=True,
             frames_per_buffer=self.aw.CHUNK_SIZE)
 
-    def start():
+    def start(self):
         # start audio writer
         self.childThread.start()
         # read from queue and play
         while True:
             channels = self.queueIn.get()
-            for chunk in channels
+            for chunk in channels:
                 self.stream.write(chunk)

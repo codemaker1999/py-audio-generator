@@ -13,14 +13,14 @@ class DataProcessor:
     between -32767 and 32767.
     '''
 
-    def __init__(dataCollector, queueSize=1000):
+    def __init__(self, dataCollector, queueSize=1000):
         # connect FIFO queues
         self.queueOut    = Queue(queueSize)
         self.dc          = dataCollector
         self.queueIn     = dataCollector.queueOut
         self.childThread = Thread(target=self.dc.start)
 
-    def start():
+    def start(self):
         # start data collection
         self.childThread.start()
         # read/write from queue
@@ -30,13 +30,13 @@ class DataProcessor:
             self.queueOut.put( result )
 
 
-    def process(data):
+    def process(self, data):
         result = []
         for row in data:
             newrow = []
             for num in row:
                 # convert to amp between 0 and 10000 hz
-                a = num*10000
+                a = int(num*10000)
                 newrow.append(a)    
             result.append(newrow)
         return result
