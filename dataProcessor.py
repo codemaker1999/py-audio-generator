@@ -29,5 +29,14 @@ class DataProcessor:
             result = self.process( buf )
             self.queueOut.put( result )
 
-    def process(buf):
-        pass
+
+    def process(data):
+        result = []
+        for row in data:
+            newrow = []
+            for num in row:
+                # convert to amp between 0 and 10000 hz
+                a = num*10000
+                newrow.append(a)    
+            result.append(newrow)
+        return result
