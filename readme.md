@@ -16,8 +16,8 @@ The flow of data through the system is as follows:
 
 ##### **Implementation Details**
 
-* each object is run in it's own thread and queues data in FIFO pipes for the proceeding step
+* each object is run in it's own thread and queues output data in FIFO pipes for the proceeding step
 
-* current implementation uses the Python bindings for PortAudio for audio playback
+* current implementation uses PyAudio, the Python bindings for PortAudio, for audio playback
 
 ##### **Usage**
