@@ -1,13 +1,13 @@
 from Queue import Queue
 
-class DataProcessor:
-    def __init__(dataCollector, queueSize=1000):
+class AudioWriter:
+    def __init__(dataProcessor, queueSize=1000):
         # connect FIFO queues
         self.queueOut = Queue(queueSize)
-        self.dc       = dataCollector
-        self.queueIn  = dataCollector.queueOut
-        # start data collection
-        dc.start()
+        self.dp       = dataProcessor
+        self.queueIn  = dataProcessor.queueOut
+        # start data processor
+        dp.start()
 
     def start():
         while True:
