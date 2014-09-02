@@ -13,7 +13,7 @@ info = { "CHUNK_SIZE" : 1024,
 # controller class
 
 class Controller:
-    def __init__(self, queueSize=10):
+    def __init__(self, queueSize=5):
         # connect FIFO queues
         self.queueOut = Queue(queueSize)
 
@@ -29,7 +29,7 @@ class Controller:
 # custom data collector
 
 class DataCollector:
-    def __init__(self, controller, info, queueSize=10):
+    def __init__(self, controller, info, queueSize=5):
         # connect FIFO queues
         self.queueOut = Queue(queueSize)
         self.ctrl = controller
@@ -80,7 +80,7 @@ class DataProcessor:
     between -32767 and 32767.
     '''
 
-    def __init__(self, dataCollector, info, queueSize=10):
+    def __init__(self, dataCollector, info, queueSize=5):
         # connect FIFO queues
         self.queueOut    = Queue(queueSize)
         self.dc          = dataCollector
@@ -108,10 +108,10 @@ class DataProcessor:
         return output
 
 # link objects and run
-ctrl = Controller (10)
-dc   = DataCollector (ctrl, info, 10)
-dp   = DataProcessor (dc, info, 10)
-aw   = AudioWriter (dp, info, 10)
+ctrl = Controller ()
+dc   = DataCollector (ctrl, info)
+dp   = DataProcessor (dc, info)
+aw   = AudioWriter (dp, info)
 ap   = AudioPlayer (aw, info)
 
 ap.start()

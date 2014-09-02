@@ -14,7 +14,7 @@ info = { "CHUNK_SIZE" : 1024,
 
 class DataCollector:
 
-    def __init__(self, info, queueSize=1000):
+    def __init__(self, info, queueSize=5):
         # connect FIFO queues
         self.queueOut = Queue(queueSize)
 
@@ -44,7 +44,7 @@ class DataProcessor:
     between -32767 and 32767.
     '''
 
-    def __init__(self, dataCollector, info, queueSize=1000):
+    def __init__(self, dataCollector, info, queueSize=5):
         # connect FIFO queues
         self.queueOut    = Queue(queueSize)
         self.dc          = dataCollector
@@ -85,7 +85,7 @@ class AudioWriter:
     Produces an array of writable audio chunks.
     '''
 
-    def __init__(self, dataProcessor, info, queueSize=1000):
+    def __init__(self, dataProcessor, info, queueSize=5):
         # connect FIFO queues
         self.queueOut    = Queue(queueSize)
         self.dp          = dataProcessor
