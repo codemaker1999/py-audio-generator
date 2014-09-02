@@ -5,11 +5,16 @@ from array import array
 from struct import pack
 import pyaudio
 
+info = { "CHUNK_SIZE" : 1024,
+         "FORMAT"     : pyaudio.paInt16,
+         "RATE"       : 44100,
+         "CHANNELS"   : 2 }
+
 #########################################################
 
 class DataCollector:
 
-    def __init__(self, queueSize=1000):
+    def __init__(self, info, queueSize=1000):
         # connect FIFO queues
         self.queueOut = Queue(queueSize)
 
@@ -39,7 +44,7 @@ class DataProcessor:
     between -32767 and 32767.
     '''
 
-    def __init__(self, dataCollector, queueSize=1000):
+    def __init__(self, dataCollector, info, queueSize=1000):
         # connect FIFO queues
         self.queueOut    = Queue(queueSize)
         self.dc          = dataCollector
@@ -51,8 +56,8 @@ class DataProcessor:
         self.childThread.start()
         # read/write from queue
         while True:
-            buf = self.queueIn.get()
-            output = self.process( buf )
+            channels = self.queueIn.get()
+            output = self.process( channels )
             self.queueOut.put( output )
 
 
@@ -80,12 +85,7 @@ class AudioWriter:
     Produces an array of writable audio chunks.
     '''
 
-    CHUNK_SIZE = 1024
-    FORMAT = pyaudio.paInt16
-    RATE = 44100
-    CHANNELS = 1
-
-    def __init__(self, dataProcessor, queueSize=1000):
+    def __init__(self, dataProcessor, info, queueSize=1000):
         # connect FIFO queues
         self.queueOut    = Queue(queueSize)
         self.dp          = dataProcessor
@@ -137,7 +137,7 @@ class AudioPlayer:
     through the default audio device.
     '''
 
-    def __init__(self, audioWriter):
+    def __init__(self, audioWriter, info):
         # connect FIFO queues
         self.aw          = audioWriter
         self.queueIn     = audioWriter.queueOut
@@ -145,11 +145,11 @@ class AudioPlayer:
         # start audio devices
         self.audioDevice = pyaudio.PyAudio()
         self.stream = self.audioDevice.open( \
-            format=self.aw.FORMAT,
-            channels=self.aw.CHANNELS,
-            rate=self.aw.RATE,
+            format=info["FORMAT"],
+            channels=info["CHANNELS"],
+            rate=info["RATE"],
             output=True,
-            frames_per_buffer=self.aw.CHUNK_SIZE)
+            frames_per_buffer=info["CHUNK_SIZE"])
 
     def start(self):
         # start audio writer
