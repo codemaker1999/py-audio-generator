@@ -1,6 +1,6 @@
 from DefaultComponents import DataProcessor, AudioWriter, AudioPlayer
 from random import random
-from Queue import Queue
+from Queue import Queue, Empty
 from threading import Thread
 from math import sin, pi
 import pyaudio
@@ -10,23 +10,51 @@ info = { "CHUNK_SIZE" : 1024,
          "RATE"       : 44100,
          "CHANNELS"   : 2 }
 
+# controller class
+
+class Controller:
+    def __init__(self, queueSize=10):
+        # connect FIFO queues
+        self.queueOut = Queue(queueSize)
+
+    def start(self):
+        while True:
+            f = raw_input("Enter frequency value in Hz\n")
+            try:
+                f = int(f)
+                self.queueOut.put(f)
+            except Exception as e:
+                pass
+
 # custom data collector
 
 class DataCollector:
-    def __init__(self, info, queueSize=1000):
+    def __init__(self, controller, info, queueSize=10):
         # connect FIFO queues
         self.queueOut = Queue(queueSize)
+        self.ctrl = controller
+        self.queueIn = self.ctrl.queueOut
+        self.childThread = Thread(target=self.ctrl.start)
 
     def start(self):
         # unpack
         CHUNK_SIZE = info["CHUNK_SIZE"]
         RATE       = info["RATE"]
         CHANNELS   = info["CHANNELS"]
+        # sine wave parameter
         m = 0
-        freq = 400 # Hz
+        # start controller thread and wait for frequency
+        self.childThread.start()
+        freq = self.queueIn.get()
         # read/write from queues
         while True:
             chans = []
+            # check queue, continue loop if queue empty
+            try:
+                freq = self.queueIn.get_nowait()
+            except Empty as e:
+                pass
+            # build chunk
             for i in range(CHANNELS):
                 nums = []
                 # r = random()
@@ -52,7 +80,7 @@ class DataProcessor:
     between -32767 and 32767.
     '''
 
-    def __init__(self, dataCollector, info, queueSize=1000):
+    def __init__(self, dataCollector, info, queueSize=10):
         # connect FIFO queues
         self.queueOut    = Queue(queueSize)
         self.dc          = dataCollector
@@ -80,10 +108,10 @@ class DataProcessor:
         return output
 
 # link objects and run
+ctrl = Controller (10)
+dc   = DataCollector (ctrl, info, 10)
+dp   = DataProcessor (dc, info, 10)
+aw   = AudioWriter (dp, info, 10)
+ap   = AudioPlayer (aw, info)
 
-dc = DataCollector (info)
-dp = DataProcessor (dc, info)
-aw = AudioWriter   (dp, info)
-ap = AudioPlayer   (aw, info)
-print 'starting...'
 ap.start()
