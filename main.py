@@ -8,7 +8,23 @@ import pyaudio
 info = { "CHUNK_SIZE" : 1024,
          "FORMAT"     : pyaudio.paInt16,
          "RATE"       : 44100,
-         "CHANNELS"   : 2 }
+         "CHANNELS"   : 4 }
+
+# controller class
+
+class BassController:
+    def __init__(self, queueSize=5):
+        # connect FIFO queues
+        self.queueOut = Queue(queueSize)
+
+    def start(self):
+        while True:
+            f = raw_input("Enter frequency value in Hz\n")
+            try:
+                f = int(f)
+                self.queueOut.put(f)
+            except Exception as e:
+                pass
 
 # controller class
 
@@ -52,10 +68,13 @@ class DataCollector:
             # check queue, continue loop if queue empty
             try:
                 freq = self.queueIn.get_nowait()
+                m = 0
             except Empty as e:
                 pass
             # build chunk
             for i in range(CHANNELS):
+                # DEBUG: offset channels by 50Hz
+                f = freq + 50*i
                 nums = []
                 # r = random()
                 for j in range(CHUNK_SIZE):
@@ -108,10 +127,10 @@ class DataProcessor:
         return output
 
 # link objects and run
-ctrl = Controller ()
-dc   = DataCollector (ctrl, info)
-dp   = DataProcessor (dc, info)
-aw   = AudioWriter (dp, info)
+ctrl = Controller (1)
+dc   = DataCollector (ctrl, info,1)
+dp   = DataProcessor (dc, info,1)
+aw   = AudioWriter (dp, info,1)
 ap   = AudioPlayer (aw, info)
 
 ap.start()
