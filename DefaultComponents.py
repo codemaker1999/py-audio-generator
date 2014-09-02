@@ -16,14 +16,14 @@ class DataCollector:
     def start(self):
         # read/write from queue
         while True:
-            chan = []
+            channels = []
             for i in range(2):
                 nums = []
                 for j in range(100):
                     n = random()
                     nums.append(n)
-                chan.append(nums)
-            self.queueOut.put( chan )
+                channels.append(nums)
+            self.queueOut.put( channels )
 
 #########################################################
 
@@ -52,20 +52,20 @@ class DataProcessor:
         # read/write from queue
         while True:
             buf = self.queueIn.get()
-            result = self.process( buf )
-            self.queueOut.put( result )
+            output = self.process( buf )
+            self.queueOut.put( output )
 
 
-    def process(self, data):
-        result = []
-        for row in data:
-            newrow = []
-            for num in row:
-                # convert to amp between 0 and 10000 hz
+    def process(self, channels):
+        output = []
+        for chan in channels:
+            newchan = []
+            for num in chan:
+                # convert to amp between 0 and 10000
                 a = int(num*10000)
-                newrow.append(a)    
-            result.append(newrow)
-        return result
+                newchan.append(a)    
+            output.append(newchan)
+        return output
 
 #########################################################
 
@@ -82,7 +82,7 @@ class AudioWriter:
 
     CHUNK_SIZE = 1024
     FORMAT = pyaudio.paInt16
-    RATE = 41000
+    RATE = 44100
     CHANNELS = 1
 
     def __init__(self, dataProcessor, queueSize=1000):
@@ -97,18 +97,18 @@ class AudioWriter:
         self.childThread.start()
         # read/write from queue
         while True:
-            buf = self.queueIn.get()
-            result = self.process( buf )
+            channels = self.queueIn.get()
+            result = self.process( channels )
             self.queueOut.put( result )
 
-    def process(self, buf):
+    def process(self, channels):
         output = []
 
-        for channel in buf:
-            chunk = array('h')
+        for chan in channels:
+            chunk = array('h') # efficient array
 
-            for amp in channel:
-                # Check for Clips
+            for amp in chan:
+                # Check for clipping
                 if int(amp) < -32767:
                     amp = -32767
                     print("clip at "+str(i))
@@ -161,11 +161,3 @@ class AudioPlayer:
                 self.stream.write(chunk)
 
 #########################################################
-
-def autostart():
-    dc = DataCollector()
-    dp = DataProcessor(dc)
-    aw = AudioWriter(dp)
-    ap = AudioPlayer(aw)
-
-    ap.start()
