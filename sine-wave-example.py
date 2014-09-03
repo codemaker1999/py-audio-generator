@@ -8,7 +8,7 @@ import pyaudio
 info = { "CHUNK_SIZE" : 1024,
          "FORMAT"     : pyaudio.paInt16,
          "RATE"       : 44100,
-         "CHANNELS"   : 4 }
+         "CHANNELS"   : 2 }
 
 # controller class
 
@@ -79,7 +79,7 @@ class DataCollector:
                 # r = random()
                 for j in range(CHUNK_SIZE):
                     # play a tone of <freq> Hertz
-                    n = 0.5*(1 + sin(m*freq/float(RATE)))
+                    n = 0.5*(1 + sin(m*f/float(RATE)))
                     nums.append(n)
                     m += 1
                 chans.append(nums)
