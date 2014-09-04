@@ -26,6 +26,4 @@ Running the `DefaultComponents.py` file should produce white noise, and the `sin
 
 * tested with python 2.8 and PyAudio 0.2.8 on Windows 8.1
 
-* each object is run in it's own thread and queues output data in FIFO pipes for the proceeding step
-
 * current implementation uses PyAudio, the Python bindings for PortAudio, for audio playback
